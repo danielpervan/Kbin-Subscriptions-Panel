@@ -709,11 +709,7 @@
 
         modal.querySelector("#subscription-panel-extend-width").addEventListener("change", (e) => {
             const settings = getSettings();
-            if (e.target.checked) {
-                settings.extendWidth = true;
-            } else {
-                settings.extendWidth = false;
-            }
+            settings.extendWidth = !!e.target.checked;
             saveSettings(settings);
             applySettings();
         });
@@ -732,31 +728,19 @@
 
         modal.querySelector("#subscription-panel-hide-on-collapse").addEventListener("change", (e) => {
             const settings = getSettings();
-            if (e.target.checked) {
-                settings.hideOnCollapse = true;
-            } else {
-                settings.hideOnCollapse = false;
-            }
+            settings.hideOnCollapse = !!e.target.checked;
             saveSettings(settings);
             applySettings();
         });
         modal.querySelector("#subscription-panel-show-onboarding").addEventListener("change", (e) => {
             const settings = getSettings();
-            if (e.target.checked) {
-                settings.onboardingDone = false;
-            } else {
-                settings.onboardingDone = true;
-            }
+            settings.onboardingDone = !e.target.checked;
             saveSettings(settings);
         }
         );
         modal.querySelector("#subscription-panel-force-mobile").addEventListener("change", (e) => {
             const settings = getSettings();
-            if (e.target.checked) {
-                settings.forceMobile = true;
-            } else {
-                settings.forceMobile = false;
-            }
+            settings.forceMobile = !!e.target.checked;
             saveSettings(settings);
             applySettings();
         }
@@ -794,13 +778,12 @@
     }
 
     function getSettings() {
-        let settings = localStorage.getItem("subscription-panel-settings");
-        if (!settings) {
-            settings = {};
-        } else {
-            settings = JSON.parse(settings);
+        const settings = localStorage.getItem("subscription-panel-settings");
+        let settingsObj = {};
+        if (settings) {
+            settingsObj = JSON.parse(settings);
         }
-        return settings;
+        return settingsObj;
     }
 
     function saveSettings(settings) {
@@ -913,7 +896,7 @@
             <p>Click on the <i class="fa-solid fa-chevron-left"></i> icon to collapse the panel.</p>
             <p>Click on the <i class="fa-solid fa-cog"></i> icon to open the settings.</p>
             <p>Click on the <i class="fa-solid fa-newspaper"></i> icon to open the panel on mobile.</p>
-            <p>Please take a few seconds to review the settings in the next step. You can also do this later if you you want.</p>
+            <p>Please take a few seconds to review the settings in the next step. You can also do this later if you want.</p>
             <a href="#" class="subscription-panel-onboarding-next">Show settings <i class="fa-solid fa-chevron-right"></i></a>
         </div>
         `;
