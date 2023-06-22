@@ -2,7 +2,7 @@
 // @name         Kbin Subscriptions Panel
 // @namespace    https://perry.dev
 // @license      MIT
-// @version      1.1
+// @version      1.2
 // @description  Adds a side panel with all magazine subscriptions.
 // @author       Daniel Pervan
 // @match        https://kbin.social/*
@@ -323,6 +323,10 @@
                 opacity: 1;
             }
         }
+        
+        body.subscription-panel-open {
+            overflow: hidden;
+        }
 
         body.subscription-panel-force-mobile.subscription-panel-open #middle > .kbin-container #subscription-panel {
             height: 100%;
@@ -330,8 +334,8 @@
             width: 100%;
             overflow: hidden;
             position: fixed;
-            top: 49px;
-            z-index: 98;
+            z-index: 2;
+            top: 0;
             border-radius: 0 !important;
             border: none;
             margin: 0;
@@ -344,14 +348,14 @@
 
         body.subscription-panel-force-mobile.subscription-panel-open #middle > .kbin-container #subscription-panel-content {
             height: 100%;
-            top: 1em;
             overflow: auto;
             padding: 1em 10em;
             padding-bottom: 100px!important;
             position: fixed;
+            top: 49px;
             width: fit-content;
-            z-index: 98;
             margin: 0;
+            margin-top: 2em;
             animation: showMobileSubscriptionPanel 0.2s ease-out;
         }
 
@@ -404,7 +408,7 @@
                 left: 0;
                 position: fixed;
                 width: 100%;
-                z-index: 98;
+                z-index: 2;
                 margin: 0;
                 animation: showMobileSubscriptionPanel 0.2s ease-out;
             }
@@ -417,8 +421,8 @@
                 width: 100% !important;
                 border-radius: 0 !important;
                 border: none;
-                top: 0 !important;
-                margin: 0;
+                top: 49px !important;
+                margin: 0 !important;
                 overflow: auto;
 
             }
@@ -846,6 +850,9 @@
 
     function openMobilePanel() {
         document.body.classList.add("subscription-panel-open");
+        if (!document.body.classList.contains("fixed-navbar")) {
+            window.scrollTo(0, 0);
+        }
     }
 
     function closeMobilePanel() {
