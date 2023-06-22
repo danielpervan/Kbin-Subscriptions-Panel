@@ -2,7 +2,7 @@
 // @name         Kbin Subscriptions Panel
 // @namespace    https://perry.dev
 // @license      MIT
-// @version      1.2
+// @version      1.3
 // @description  Adds a side panel with all magazine subscriptions.
 // @author       Daniel Pervan
 // @match        https://kbin.social/*
@@ -12,6 +12,10 @@
 (function () {
 
     'use strict';
+
+    /** Globals */
+    let subscriptions = [];
+
     function addSubscriptionsSidePanel() {
         const loginElement = document.querySelector(".login");
         if (loginElement.href.endsWith("/login")) {
@@ -546,7 +550,6 @@
         /** Add subscription list */
         magazinePanel.appendChild(magazinePanelUl);
 
-        let spinner;
         let cache = getCache();
         if (cache.length > 0) {
             addMagazines(cache);
@@ -558,10 +561,14 @@
             magazinePanel.appendChild(spinner);
         }
         /** Fetch subscription page */
+        fetchSubscriptionPage(1);
+    }
+
+    function fetchSubscriptionPage(page) {
         const xhr = new XMLHttpRequest();
-        xhr.open("GET", "/settings/subscriptions/magazines", true);
         xhr.onreadystatechange = function () {
             if (this.readyState === 4) {
+                const spinner = document.querySelector("#subscription-panel-spinner");
                 if (spinner) {
                     spinner.remove();
                 }
@@ -584,24 +591,48 @@
                         mag.img = el.querySelector("figure img")?.src;
                         magazines.push(mag);
                     });
-                    saveCache(magazines);
-                    addMagazines(magazines);
+                    appendSubscriptions(magazines);
+                    /** Fetch next page */
+                    let nextPage = dom.querySelector("a.pagination__item.pagination__item--next-page")?.href;
+                    nextPage = nextPage ? nextPage.match(/p=(\d+)/)[1] : undefined;
+                    nextPage = nextPage ? parseInt(nextPage) : 1;
 
+                    /** Fetch next page if it exists */
+                    /** Fail safe to prevent infinite loop */
+                    if (page < nextPage && page < 100) {
+                        fetchSubscriptionPage(page + 1);
+                    }
                 } else {
-                    magazinePanel.appendChild(document.createTextNode("Failed to load subscriptions"));
+                    document.querySelector("#subscription-panel-content").appendChild(document.createTextNode("Failed to load subscriptions"));
                 }
             }
         };
+
+        xhr.open("GET", "/settings/subscriptions/magazines?p="+page, true);
         xhr.send();
+    }
+    function appendSubscriptions(magazines) {
+        /** Merge the new magazines with the old ones */
+        magazines.forEach((mag) => {
+            if (subscriptions.findIndex((sub) => sub.url === mag.url) === -1) {
+                subscriptions.push(mag);
+            }
+        }
+        );
+        /** Sort magazines by name */
+        subscriptions.sort((a, b) => {
+            return a.name.localeCompare(b.name);
+        })
+        /** Save the subscriptions */
+        saveCache(subscriptions);
+        /** Add the new magazines to the panel */
+        addMagazines(subscriptions);
     }
 
     function addMagazines(magazines) {
+        /** Add magazines to the panel */
         const magazinePanelUl = document.querySelector("#subscription-panel ul");
         magazinePanelUl.innerHTML = "";
-        /** Sort magazines by name */
-        magazines.sort((a, b) => {
-            return a.name.localeCompare(b.name);
-        })
 
         magazines.forEach(mag => {
             /** Create the item dom element */
