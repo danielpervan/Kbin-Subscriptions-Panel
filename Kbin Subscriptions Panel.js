@@ -2,7 +2,7 @@
 // @name         Kbin Subscriptions Panel
 // @namespace    https://perry.dev
 // @license      MIT
-// @version      1.4
+// @version      1.5
 // @description  Adds a side panel with all magazine subscriptions.
 // @author       Daniel Pervan
 // @match        https://kbin.social/*
@@ -386,7 +386,7 @@
         }
 
         a.subscription-panel-mobile-button i {
-            font-size: medium;
+            font-size: .85rem;
         }
 
         body.subscription-panel-open #header menu li a.subscription-panel-mobile-button {
@@ -533,6 +533,7 @@
         mobileButton.className = "subscription-panel-mobile-button";
         mobileButton.title = "Subscriptions";
         mobileButton.ariaLabel = "Subscriptions";
+        mobileButton.href = "#";
         mobileButton.innerHTML = '<i class="fa-solid fa-newspaper"></i>';
         mobileButton.addEventListener("click", () => {
             toggleOpenMobilePanel();
