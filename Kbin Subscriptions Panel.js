@@ -2,7 +2,7 @@
 // @name         Kbin Subscriptions Panel
 // @namespace    https://perry.dev
 // @license      MIT
-// @version      1.3
+// @version      1.4
 // @description  Adds a side panel with all magazine subscriptions.
 // @author       Daniel Pervan
 // @match        https://kbin.social/*
@@ -601,6 +601,8 @@
                     /** Fail safe to prevent infinite loop */
                     if (page < nextPage && page < 100) {
                         fetchSubscriptionPage(page + 1);
+                    } else {
+                        addMagazines(subscriptions);
                     }
                 } else {
                     document.querySelector("#subscription-panel-content").appendChild(document.createTextNode("Failed to load subscriptions"));
@@ -625,8 +627,6 @@
         })
         /** Save the subscriptions */
         saveCache(subscriptions);
-        /** Add the new magazines to the panel */
-        addMagazines(subscriptions);
     }
 
     function addMagazines(magazines) {
