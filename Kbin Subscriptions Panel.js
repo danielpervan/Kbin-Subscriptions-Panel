@@ -787,6 +787,12 @@
         if (settings) {
             settingsObj = JSON.parse(settings);
         }
+
+        /** Set defaults */
+        if (settingsObj.useCache === undefined) {
+            settingsObj.useCache = true;
+        }
+
         return settingsObj;
     }
 
