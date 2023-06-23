@@ -674,8 +674,9 @@
         mobileButton.ariaLabel = "Subscriptions";
         mobileButton.href = "#";
         mobileButton.innerHTML = '<i class="fa-solid fa-newspaper"></i>';
-        mobileButton.addEventListener("click", () => {
+        mobileButton.addEventListener("click", (e) => {
             toggleOpenMobilePanel();
+            e.preventDefault();
         });
         mobileButtonLi.appendChild(mobileButton);
         menu.insertBefore(mobileButtonLi, menu.firstChild);
