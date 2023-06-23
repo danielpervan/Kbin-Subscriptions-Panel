@@ -2,7 +2,7 @@
 // @name         Kbin Subscriptions Panel
 // @namespace    https://perry.dev
 // @license      MIT
-// @version      1.5
+// @version      1.6
 // @description  Adds a side panel with all magazine subscriptions.
 // @author       Daniel Pervan
 // @match        https://kbin.social/*
