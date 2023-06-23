@@ -494,6 +494,7 @@
 
             body.subscription-panel-open #middle > .kbin-container #subscription-panel {
                 height: 100%;
+                top: 0;
                 left: 0;
                 position: fixed;
                 width: 100%;
