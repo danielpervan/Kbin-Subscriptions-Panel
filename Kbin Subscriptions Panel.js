@@ -76,6 +76,41 @@
         .subscription-panel-modal-content .close:hover {
             color: color: var(--kbin-sidebar-header-text-color);
         }
+        
+        #subscription-panel .search-box-container {
+            position: relative;
+        }
+        
+        #subscription-panel .search-box-clear {
+            position: absolute;
+            top: 0.6em;
+            right: 1em;
+            font-size: 1.5em;
+            display: none;
+            cursor: pointer;
+            transition: color 0.2s ease-in-out;
+            animation: searchBoxClearShow 0.25s ease-in-out;
+        }
+        
+        @keyframes searchBoxClearShow {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        #subscription-panel .search-box-clear:hover {
+            color: var(--kbin-sidebar-header-text-color);
+        }
+        
+        #subscription-panel .search-box-clear.active {
+            display: block;
+        }
+       
 
         #subscription-panel-settings-button {
             position: absolute;
@@ -190,7 +225,7 @@
             padding-left: 1.8;
         }
 
-        body.subscription-panel-collapsed #middle > .kbin-container #subscription-panel input {
+        body.subscription-panel-collapsed #middle > .kbin-container #subscription-panel .search-box-container {
             display: none;
         }
 
@@ -276,6 +311,56 @@
         #subscription-panel .instance-name {
             opacity: 0.8;
             font-weight: 100;
+        }
+        
+        #subscription-panel ul li.group {
+            font-weight: 700;
+        }
+        
+        #subscription-panel ul li.group a.group-name .name {
+            margin-left: .5em;
+        }
+        
+        #subscription-panel ul li.group a.group-name .count {
+            margin-left: .25em;
+            font-weight: 400;
+            opacity: 0.8;
+        }
+        
+        #subscription-panel ul li.group a.group-name .image {
+            font-size: 1.2em;
+            vertical-align: middle;
+            width: 1.2em;
+        }
+        
+        #subscription-panel ul li.group ul {
+            margin-left: 0.75em;
+            padding-left: 0.75em;
+            border-left: var(--kbin-sidebar-header-border);
+            border-bottom: var(--kbin-sidebar-header-border);
+            width: fit-content;
+            border-bottom-left-radius: 0.5rem;
+            display: none;
+        }
+        
+        #subscription-panel ul li.group.open ul {
+            animation: openGroup 0.25s ease-in-out;
+            display: block;
+        }
+
+        #subscription-panel ul li.group ul li {
+            font-weight: 400;
+        }
+        
+        @keyframes openGroup {
+            0% {
+                transform: translateY(-.5em);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
     
         #subscription-panel-spinner {
@@ -456,11 +541,8 @@
                 font-size: 1.2em;
             }
         }
-
-    
-
+        
         /** Onboarding */
-
         .subscription-panel-onboarding .subscription-panel-onboarding-content {
             max-width: 800px;
         }
@@ -490,19 +572,76 @@
         /** Add search box */
         const searchBox = document.createElement("input");
         searchBox.type = "text";
+        searchBox.id = "subscription-panel-search";
         searchBox.placeholder = "Filter";
         searchBox.addEventListener("input", (e) => {
             let filter = e.target.value.toLowerCase();
+            if (filter.length === 0) {
+                magazinePanelUl.querySelectorAll("li").forEach((li) => {
+                    li.classList.remove("hideItem");
+                    if (li.classList.contains("open")) {
+                        li.classList.remove("open");
+                        const i = li.querySelector("i");
+                        i.classList.remove("fa-box-open");
+                        i.classList.add("fa-box");
+                    }
+                });
+                return;
+            }
             magazinePanelUl.querySelectorAll("li").forEach((li) => {
                 let a = li.querySelector("a");
+                let subMags = li.querySelectorAll("li");
                 if (a.innerText.toLowerCase().indexOf(filter) > -1) {
                     li.classList.remove("hideItem");
                 } else {
-                    li.classList.add("hideItem");
+                    let found = false;
+                    if (subMags?.length > 0) {
+                        subMags.forEach(subMag => {
+                            if (subMag.innerText.toLowerCase().indexOf(filter) > -1) {
+                                li.classList.remove("hideItem");
+                                found = true;
+                                li.classList.add("open");
+                                const i = li.querySelector("i");
+                                i.classList.remove("fa-box");
+                                i.classList.add("fa-box-open");
+
+                            }
+                        });
+                    }
+                    if (!found) {
+                        li.classList.add("hideItem");
+                    }
                 }
             });
         });
-        magazinePanel.appendChild(searchBox);
+
+        const searchBoxClear = document.createElement("span");
+        searchBoxClear.className = "search-box-clear";
+        searchBoxClear.innerHTML = '<i class="fa-solid fa-times"></i>';
+        searchBoxClear.addEventListener("click", () => {
+            searchBox.value = "";
+            searchBox.dispatchEvent(new Event("input"));
+        });
+
+        searchBox.addEventListener("input", () => {
+            if (searchBox.value.length > 0) {
+                searchBoxClear.classList.add("active");
+            } else {
+                searchBoxClear.classList.remove("active");
+            }
+        });
+        searchBox.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") {
+                searchBox.value = "";
+                searchBox.dispatchEvent(new Event("input"));
+            }
+        });
+
+        const searchBoxContainer = document.createElement("div");
+        searchBoxContainer.className = "search-box-container";
+        searchBoxContainer.appendChild(searchBox);
+        searchBoxContainer.appendChild(searchBoxClear);
+        magazinePanel.appendChild(searchBoxContainer);
 
         /** Add settings button */
         const settingsButton = document.createElement("div");
@@ -566,6 +705,7 @@
     }
 
     function fetchSubscriptionPage(page) {
+        page = page || 1;
         const xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function () {
             if (this.readyState === 4) {
@@ -615,11 +755,36 @@
         xhr.send();
     }
     function appendSubscriptions(magazines) {
+        const settings = getSettings();
+        const useGroups = settings?.useGroups;
+
         /** Merge the new magazines with the old ones */
         magazines.forEach((mag) => {
-            if (subscriptions.findIndex((sub) => sub.url === mag.url) === -1) {
+            let found = false;
+            subscriptions.some((sub, index) => {
+                if (sub.url === mag.url) {
+                    found = true;
+                } else if (useGroups && sub.name.toLowerCase() === mag.name.toLowerCase()) {
+                    if (sub?.type === "group") {
+                        sub.magazines.push(mag);
+                    } else {
+                        subscriptions[index] = {
+                            name: sub.name,
+                            fullName: sub.name,
+                            type: "group",
+                            magazines: [sub, mag]
+                        };
+                    }
+                    found = true;
+                }
+                return found;
+            });
+            if (!found) {
                 subscriptions.push(mag);
             }
+           /* if (subscriptions.findIndex((sub) => sub.url === mag.url) === -1) {
+                subscriptions.push(mag);
+            }*/
         }
         );
         /** Sort magazines by name */
@@ -630,37 +795,80 @@
         saveCache(subscriptions);
     }
 
+    function reloadSubscriptions() {
+        subscriptions = [];
+        fetchSubscriptionPage(1);
+    }
+
+    function addMagazine(mag, parent) {
+        /** Create the item dom element */
+        let li = document.createElement("li");
+        let a = document.createElement("a");
+        a.href = mag.url;
+        a.title = mag.fullName;
+        if (mag.img) {
+            let img = document.createElement("img");
+            img.src = mag.img;
+            a.appendChild(img);
+        } else {
+            /** Add some padding when there is no magazine image */
+            li.classList.add("no-image");
+        }
+        const span = document.createElement("span");
+        span.className = "name";
+        span.appendChild(document.createTextNode(mag.name));
+        a.appendChild(span);
+        if (mag.instanceName) {
+            const span = document.createElement("span");
+            span.className = "instance-name";
+            span.appendChild(document.createTextNode("@" + mag.instanceName));
+            a.appendChild(span);
+        }
+        li.appendChild(a);
+        parent.appendChild(li);
+    }
+
     function addMagazines(magazines) {
         /** Add magazines to the panel */
         const magazinePanelUl = document.querySelector("#subscription-panel ul");
         magazinePanelUl.innerHTML = "";
 
         magazines.forEach(mag => {
-            /** Create the item dom element */
-            let li = document.createElement("li");
-            let a = document.createElement("a");
-            a.href = mag.url;
-            a.title = mag.fullName;
-            if (mag.img) {
-                let img = document.createElement("img");
-                img.src = mag.img;
-                a.appendChild(img);
+            if (mag?.type === "group") {
+                let li = document.createElement("li");
+                li.classList.add("group");
+                let a = document.createElement("a");
+                a.className = "group-name";
+                a.href = "#";
+                a.title = mag.fullName;
+                a.ariaLabel = mag.fullName;
+                a.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    li.classList.toggle("open");
+                    const icon = a.querySelector("i");
+                    if (li.classList.contains("open")) {
+                        a.setAttribute("aria-expanded", "true");
+                        icon.classList.remove("fa-box");
+                        icon.classList.add("fa-box-open");
+                    } else {
+                        a.setAttribute("aria-expanded", "false");
+                        icon.classList.remove("fa-box-open");
+                        icon.classList.add("fa-box");
+                    }
+                });
+                a.innerHTML = '<i class="fa-solid fa-box image"></i><span class="name">' + mag.name + '</span><span class="count">(' + mag.magazines.length + ")</span>";
+                li.appendChild(a);
+                let ul = document.createElement("ul");
+                mag.magazines.forEach((subMag) => {
+                    addMagazine(subMag, ul);
+                });
+                li.appendChild(ul);
+                magazinePanelUl.appendChild(li);
             } else {
-                /** Add some padding when there is no magazine image */
-                li.classList.add("no-image");
+                addMagazine(mag, magazinePanelUl);
             }
-            const span = document.createElement("span");
-            span.className = "name";
-            span.appendChild(document.createTextNode(mag.name));
-            a.appendChild(span);
-            if (mag.instanceName) {
-                const span = document.createElement("span");
-                span.className = "instance-name";
-                span.appendChild(document.createTextNode("@" + mag.instanceName));
-                a.appendChild(span);
-            }
-            li.appendChild(a);
-            magazinePanelUl.appendChild(li);
+
         });
     }
 
@@ -700,6 +908,11 @@
                             <span class="description">Always show the mobile menu, even on desktop.</span>
                         </label>
                         <label>
+                            <input type="checkbox" id="subscription-panel-use-groups" />
+                            Group identical names
+                            <span class="description">Group magazines with the same name but from different instances.</span>
+                        </label>
+                        <label>
                             <input type="checkbox" id="subscription-panel-show-onboarding" />
                             Show onboarding
                             <span class="description">Show the onboarding step again on next load.</span>
@@ -714,12 +927,10 @@
         if (settings?.extendWidth) {
             extendWidthEl.checked = true;
         }
-
         const hideOnCollapseEl = modal.querySelector("#subscription-panel-hide-on-collapse");
         if (settings?.hideOnCollapse) {
             hideOnCollapseEl.checked = true;
         }
-
         const useCacheEl = modal.querySelector("#subscription-panel-use-cache");
         if (settings?.useCache) {
             useCacheEl.checked = true;
@@ -732,7 +943,10 @@
         if (settings?.forceMobile) {
             forceMobileEl.checked = true;
         }
-
+        const useGroupsEl = modal.querySelector("#subscription-panel-use-groups");
+        if (settings?.useGroups) {
+            useGroupsEl.checked = true;
+        }
 
         modal.querySelector(".subscription-panel-settings-modal .close").addEventListener("click", () => {
             modal.remove();
@@ -772,8 +986,14 @@
             const settings = getSettings();
             settings.onboardingDone = !e.target.checked;
             saveSettings(settings);
-        }
-        );
+        });
+        modal.querySelector("#subscription-panel-use-groups").addEventListener("change", (e) => {
+            const settings = getSettings();
+            settings.useGroups = !!e.target.checked;
+            reloadSubscriptions();
+            saveSettings(settings);
+            applySettings();
+        });
         modal.querySelector("#subscription-panel-force-mobile").addEventListener("change", (e) => {
             const settings = getSettings();
             settings.forceMobile = !!e.target.checked;
@@ -785,7 +1005,6 @@
 
     function applySettings() {
         const settings = getSettings();
-
         if (settings?.extendWidth) {
             document.body.classList.add("extend-width");
         } else {
@@ -823,6 +1042,10 @@
         /** Set defaults */
         if (settingsObj.useCache === undefined) {
             settingsObj.useCache = true;
+        }
+
+        if (settingsObj.useGroups === undefined) {
+            settingsObj.useGroups = true;
         }
 
         return settingsObj;
@@ -941,7 +1164,8 @@
             <p>Click on the <i class="fa-solid fa-chevron-left"></i> icon to collapse the panel.</p>
             <p>Click on the <i class="fa-solid fa-cog"></i> icon to open the settings.</p>
             <p>Click on the <i class="fa-solid fa-newspaper"></i> icon to open the panel on mobile.</p>
-            <p>Please take a few seconds to review the settings in the next step. You can also do this later if you want.</p>
+            <p>Magazines that share the same name are grouped together. A group is indicated by a <i class="fa-solid fa-box"></i> icon.</p>
+            <p>Please take a few seconds to review the settings in the next step. You can always do this later if you want.</p>
             <a href="#" class="subscription-panel-onboarding-next">Show settings <i class="fa-solid fa-chevron-right"></i></a>
         </div>
         `;
