@@ -1,4 +1,4 @@
-import {getSettings} from "./utils";
+import {getSettings} from "../utils";
 
 class Cache {
     constructor() {

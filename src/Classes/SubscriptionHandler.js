@@ -48,7 +48,8 @@ class SubscriptionHandler {
             return a.name.localeCompare(b.name);
         })
         /** Save the subscriptions */
-        saveCache(this.subscriptions);
+        const cache = new Cache();
+        cache.save(this.subscriptions);
     }
 
     load(page) {
