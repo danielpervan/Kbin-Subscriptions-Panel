@@ -24,7 +24,10 @@ class SubscriptionsPanel {
         const magazinePanel = document.createElement("aside");
         this.contentElement = magazinePanel;
         const magazinePanelUl = document.createElement("ul");
-        magazinePanelUl.className = "loading";
+        magazinePanelUl.className = "fade-in";
+        magazinePanelUl.addEventListener("animationend", () => {
+            magazinePanelUl.classList.remove("fade-in");
+        });
         const title = document.createElement("h3");
         magazinePanel.id = "subscription-panel-content";
         title.innerHTML = '<span class="subscription-panel-header">Subscriptions</span>';
@@ -40,7 +43,13 @@ class SubscriptionsPanel {
             let filter = e.target.value.toLowerCase();
             if (filter.length === 0) {
                 magazinePanelUl.querySelectorAll("li").forEach((li) => {
-                    li.classList.remove("hideItem");
+                    if (li.classList.contains("hideItem")) {
+                        li.classList.remove("hideItem");
+                        li.addEventListener("animationend", () => {
+                            li.classList.remove("fade-in");
+                        });
+                        li.classList.add("fade-in");
+                    }
                     if (li.classList.contains("open")) {
                         li.classList.remove("open");
                         const i = li.querySelector("i");
@@ -54,13 +63,22 @@ class SubscriptionsPanel {
                 let a = li.querySelector("a");
                 let subMags = li.querySelectorAll("li");
                 if (a.innerText.toLowerCase().indexOf(filter) > -1) {
-                    li.classList.remove("hideItem");
+                    if (li.classList.contains("hideItem")) {
+                        li.classList.remove("hideItem");
+                        li.addEventListener("animationend", () => {
+                            li.classList.remove("fade-in");
+                        });
+                        li.classList.add("fade-in");
+                    }
                 } else {
                     let found = false;
                     if (subMags?.length > 0) {
                         subMags.forEach(subMag => {
                             if (subMag.innerText.toLowerCase().indexOf(filter) > -1) {
-                                li.classList.remove("hideItem");
+                                if (li.classList.contains("hideItem")) {
+                                    li.classList.add("fade-in");
+                                    li.classList.remove("hideItem");
+                                }
                                 found = true;
                                 li.classList.add("open");
                                 const i = li.querySelector("i");
@@ -72,6 +90,7 @@ class SubscriptionsPanel {
                     }
                     if (!found) {
                         li.classList.add("hideItem");
+                        li.classList.add("fade-in");
                     }
                 }
             });
@@ -104,11 +123,6 @@ class SubscriptionsPanel {
         searchBoxContainer.appendChild(searchBox);
         searchBoxContainer.appendChild(searchBoxClear);
         magazinePanel.appendChild(searchBoxContainer);
-
-        /** Add settings modalElement */
-        const settingsModal = new SettingsModal(this);
-        const settingsButton = settingsModal.getSettingsButtonElement();
-        magazinePanel.appendChild(settingsButton);
 
         /** Add collapse button */
         const collapseButton = document.createElement("span");
@@ -149,7 +163,7 @@ class SubscriptionsPanel {
         const cache = new Cache();
         let cacheData = cache.get();
         if (cacheData.length > 0) {
-            this.addMagazinesToDOM(cacheData);
+            this.addMagazinesToDOM(cacheData, false);
         } else {
             /** Add spinner */
             let spinner = document.createElement("div");
@@ -158,8 +172,8 @@ class SubscriptionsPanel {
             magazinePanel.appendChild(spinner);
         }
         /** Fetch subscription page */
-        this.subscriptionsHandler.load(1).then(() => {
-            this.addMagazinesToDOM(this.subscriptionsHandler.subscriptions);
+        this.subscriptionsHandler.load().then(() => {
+            this.addMagazinesToDOM(this.subscriptionsHandler.subscriptions, true);
         });
     }
 
@@ -255,7 +269,7 @@ class SubscriptionsPanel {
         parent.appendChild(li);
     }
 
-    addMagazinesToDOM(magazines) {
+    addMagazinesToDOM(magazines, fadeIn) {
         /** Add magazines to the panel */
         const magazinePanelUl = document.querySelector("#subscription-panel ul");
         magazinePanelUl.innerHTML = "";
@@ -295,7 +309,6 @@ class SubscriptionsPanel {
             } else {
                 this.addMagazineToDOM(mag, magazinePanelUl);
             }
-
         });
     }
 }

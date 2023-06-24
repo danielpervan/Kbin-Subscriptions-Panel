@@ -160,7 +160,7 @@ class SettingsModal {
             settings.useGroups = !!e.target.checked;
             const subscriptionsHandler = this.subscriptionsPanel.subscriptionsHandler;
             subscriptionsHandler.reload().then(() => {
-                this.subscriptionsPanel.addMagazinesToDOM(subscriptionsHandler.subscriptions);
+                this.subscriptionsPanel.addMagazinesToDOM(subscriptionsHandler.subscriptions, true);
             });
             saveSettings(settings);
             this.applySettings();

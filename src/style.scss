@@ -261,15 +261,18 @@ body.subscription-panel-collapsed:not(.subscription-panel-force-mobile) .sidebar
     line-height: 2.5em;
     padding-inline: 0;
 
-    &.loading li {
-      animation: none;
+    &.fade-in {
+      animation: showItem 0.5s ease-in-out;
+    }
+
+    li.fade-in {
+        animation: showItem 0.5s ease-in-out;
     }
 
     li {
       text-overflow: ellipsis;
       overflow: hidden;
       white-space: nowrap;
-      animation: showItem 0.5s ease-in-out;
 
       &.hideItem {
         animation: hideItem 0.25s ease-in-out;
@@ -397,9 +400,11 @@ body.subscription-panel-collapsed:not(.subscription-panel-force-mobile) .sidebar
 
 body.subscription-panel-open {
   overflow: hidden;
+
   #scroll-top {
     display: none !important;
   }
+
   &.subscription-panel-force-mobile #middle > .kbin-container #subscription-panel {
     height: 100%;
     left: 0;
