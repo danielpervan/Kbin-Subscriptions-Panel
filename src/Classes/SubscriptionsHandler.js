@@ -1,7 +1,7 @@
 import {getSettings} from "../utils";
 import Cache from "./Cache";
 
-class SubscriptionHandler {
+class SubscriptionsHandler {
     subscriptions;
 
     constructor() {
@@ -152,4 +152,4 @@ class SubscriptionHandler {
     }
 }
 
-export default SubscriptionHandler;
+export default SubscriptionsHandler;
