@@ -1,5 +1,5 @@
-import {getSettings} from "./utils";
-import {saveCache} from "./cache";
+import {getSettings} from "../utils";
+import {saveCache} from "../cache";
 
 class SubscriptionHandler {
     subscriptions;
