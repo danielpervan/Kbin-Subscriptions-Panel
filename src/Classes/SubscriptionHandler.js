@@ -1,16 +1,18 @@
 import {getSettings} from "../utils";
-import {saveCache} from "../cache";
+import Cache from "./Cache";
 
 class SubscriptionHandler {
     subscriptions;
+
     constructor() {
         this.subscriptions = [];
     }
 
-    reload(callback) {
+    reload() {
         this.subscriptions = [];
-        this.loadSubscriptions(1, callback);
+        return this.load(1);
     }
+
     append(magazines) {
         const settings = getSettings();
         const useGroups = settings?.useGroups;
@@ -49,8 +51,59 @@ class SubscriptionHandler {
         saveCache(this.subscriptions);
     }
 
+    load(page) {
+        page = page || 1;
+        /** Fetch the subscriptions page */
+        const fetchURL = "https://kbin.social/settings/subscriptions/magazines?p=" + page;
+        const fetchPromise = fetch(fetchURL)
+        return fetchPromise.then((response) => {
+            console.log(response);
+            /** Remove the spinner */
+            const spinner = document.querySelector("#subscription-panel-spinner");
+            if (spinner) {
+                spinner.remove();
+            }
+            return response.text();
+        }).then((pageContent) => {
+            /** Parse the page */
+            let dom = new DOMParser().parseFromString(pageContent, 'text/html');
+            let magazinesElements = dom.querySelectorAll(".section.magazines.magazines-columns ul>li");
+            let magazines = []
+            /** Find subscriptions */
+            magazinesElements.forEach((el) => {
+                let magA = el.querySelector("a")
+                let mag = {};
+                mag.fullName = magA.innerText;
+                const instanceName = mag.fullName.match(/@(.*)/);
+                mag.instanceName = instanceName ? instanceName[1] : undefined;
+                mag.name = mag.fullName.replace(/@(.*)/, "");
+                mag.url = magA.href;
+                mag.img = el.querySelector("figure img")?.src;
+                magazines.push(mag);
+            });
+            this.append(magazines);
+            /** Fetch next page */
+            let nextPage = dom.querySelector("a.pagination__item.pagination__item--next-page")?.href;
+            nextPage = nextPage ? nextPage.match(/p=(\d+)/)[1] : undefined;
+            nextPage = nextPage ? parseInt(nextPage) : 1;
+
+            /** Fetch next page if it exists */
+            /** Fail safe to prevent infinite loop */
+            if (page < nextPage && page < 100) {
+                return this.load(page + 1);
+            } else {
+                return Promise.resolve();
+            }
+        }).catch((error) => {
+            console.error(error);
+            document.querySelector("#subscription-panel-content").appendChild(document.createTextNode("Failed to load subscriptions"));
+            return Promise.reject(error);
+        });
+    }
+
     loadSubscriptions(page, callback) {
         page = page || 1;
+
         const xhr = new XMLHttpRequest();
         xhr.onreadystatechange = () => {
             if (xhr.readyState === 4) {

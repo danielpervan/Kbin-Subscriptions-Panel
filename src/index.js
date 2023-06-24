@@ -1,10 +1,9 @@
 import {getSettings, saveSettings} from "./utils";
-import {saveCache, removeCache, getCache} from "./cache";
+import Cache from "./Classes/Cache";
 import "./style.scss";
 import SubscriptionHandler from "./Classes/SubscriptionHandler";
 
 /** Globals */
-let subscriptions = [];
 const subscriptionHandler = new SubscriptionHandler();
 
 function addSubscriptionsSidePanel() {
@@ -147,9 +146,8 @@ function addSubscriptionsSidePanel() {
     });
     /** Add subscription list */
     magazinePanel.appendChild(magazinePanelUl);
-
-    let cache = getCache();
-    if (cache.length > 0) {
+    const cache = new Cache();
+    if (cache.get().length > 0) {
         addMagazines(cache);
     } else {
         /** Add spinner */
@@ -159,7 +157,9 @@ function addSubscriptionsSidePanel() {
         magazinePanel.appendChild(spinner);
     }
     /** Fetch subscription page */
-    subscriptionHandler.loadSubscriptions(1, addMagazines);
+    subscriptionHandler.load(1).then(() => {
+        addMagazines(subscriptionHandler.subscriptions);
+    });
 }
 function addMagazine(mag, parent) {
     /** Create the item dom element */
@@ -331,7 +331,8 @@ function showSettingsModal() {
             settings.useCache = true;
         } else {
             settings.useCache = false;
-            removeCache();
+            const cache = new Cache();
+            cache.remove();
         }
         saveSettings(settings);
         applySettings();
@@ -351,7 +352,9 @@ function showSettingsModal() {
     modal.querySelector("#subscription-panel-use-groups").addEventListener("change", (e) => {
         const settings = getSettings();
         settings.useGroups = !!e.target.checked;
-        subscriptionHandler.reload(addMagazines);
+        subscriptionHandler.reload().then(() => {
+            addMagazines(subscriptionHandler.subscriptions);
+        });
         saveSettings(settings);
         applySettings();
     });
