@@ -1,0 +1,30 @@
+{
+  "name": "kbin-subscriptions-panel",
+  "version": "1.7.0",
+  "description": "",
+  "type": "commonjs",
+  "main": "Kbin Subscriptions Panel.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "node build.mjs",
+    "monkey": "cat src/Template/header.template dist/out.js src/Template/footer.template > dist/\"Kbin Subscriptions Panel.js\"",
+    "watch": "node build.mjs --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/danielpervan/Kbin-Subscriptions-Panel.git"
+  },
+  "author": "Daniel Pervan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/danielpervan/Kbin-Subscriptions-Panel/issues"
+  },
+  "homepage": "https://github.com/danielpervan/Kbin-Subscriptions-Panel#readme",
+  "dependencies": {
+    "esbuild": "0.18.6"
+  },
+  "devDependencies": {
+    "@es-exec/esbuild-plugin-start": "^0.0.5",
+    "esbuild-inline-sass": "^0.4.1"
+  }
+}

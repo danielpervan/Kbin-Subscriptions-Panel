@@ -1,0 +1,13 @@
+// ==UserScript==
+// @name         Kbin Subscriptions Panel
+// @namespace    https://perry.dev
+// @license      MIT
+// @version      1.8
+// @description  Adds a side panel with all magazine subscriptions.
+// @author       Daniel Pervan
+// @match        https://kbin.social/*
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=kbin.social
+// ==/UserScript==
+
+(function () {
+    'use strict';
