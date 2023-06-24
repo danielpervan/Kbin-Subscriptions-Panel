@@ -1,7 +1,6 @@
 import Cache from "./Cache";
 import subscriptionHandler from "./SubscriptionsHandler";
 import {getSettings, saveSettings} from "../utils";
-import SettingsModal from "./SettingsModal";
 
 class SubscriptionsPanel {
     subscriptionsHandler;
@@ -269,7 +268,7 @@ class SubscriptionsPanel {
         parent.appendChild(li);
     }
 
-    addMagazinesToDOM(magazines, fadeIn) {
+    addMagazinesToDOM(magazines) {
         /** Add magazines to the panel */
         const magazinePanelUl = document.querySelector("#subscription-panel ul");
         magazinePanelUl.innerHTML = "";
