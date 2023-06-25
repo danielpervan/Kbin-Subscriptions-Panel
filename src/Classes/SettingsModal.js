@@ -7,7 +7,6 @@ class SettingsModal {
 
     constructor(subscriptionsPanel) {
         this.subscriptionsPanel = subscriptionsPanel;
-
     }
 
     getSettingsButtonElement() {

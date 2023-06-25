@@ -16,6 +16,19 @@ class SubscriptionsHandler {
         return this.load(1);
     }
 
+    sort() {
+        /** Sort magazines by starred then name */
+        this.subscriptions.sort((a, b) => {
+            if (a.isStarred() && !b.isStarred()) {
+                return -1;
+            } else if (!a.isStarred() && b.isStarred()) {
+                return 1;
+            } else {
+                return a.name.localeCompare(b.name);
+            }
+        })
+    }
+
     append(magazines) {
         const settings = getSettings();
         const useGroups = settings?.useGroups;
@@ -41,10 +54,7 @@ class SubscriptionsHandler {
                 }
             }
         );
-        /** Sort magazines by name */
-        this.subscriptions.sort((a, b) => {
-            return a.name.localeCompare(b.name);
-        })
+        this.sort();
         /** Save the subscriptions */
         const cache = new Cache();
         cache.save(this.subscriptions);
