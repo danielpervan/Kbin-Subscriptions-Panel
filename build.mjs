@@ -6,7 +6,7 @@ import start from '@es-exec/esbuild-plugin-start';
 const buildOptions = {
     entryPoints: ['src/index.js'],
     bundle: true,
-    minify: true,
+    minify: false,
     plugins: [inlineScss({}),
         start({
             script: "npm run monkey"

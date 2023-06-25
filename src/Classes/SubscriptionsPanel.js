@@ -6,6 +6,7 @@ class SubscriptionsPanel {
     subscriptionsHandler;
     containerElement;
     contentElement;
+
     constructor() {
         this.subscriptionsHandler = new subscriptionHandler();
     }
@@ -23,7 +24,7 @@ class SubscriptionsPanel {
         const magazinePanel = document.createElement("aside");
         this.contentElement = magazinePanel;
         const magazinePanelUl = document.createElement("ul");
-        magazinePanelUl.className = "fade-in";
+        magazinePanelUl.className = "fade-in subscription-list";
         magazinePanelUl.addEventListener("animationend", () => {
             magazinePanelUl.classList.remove("fade-in");
         });
@@ -41,6 +42,7 @@ class SubscriptionsPanel {
         searchBox.addEventListener("input", (e) => {
             let filter = e.target.value.toLowerCase();
             if (filter.length === 0) {
+                lastClickedContainer.classList.remove("hideItem");
                 magazinePanelUl.querySelectorAll("li").forEach((li) => {
                     if (li.classList.contains("hideItem")) {
                         li.classList.remove("hideItem");
@@ -58,6 +60,7 @@ class SubscriptionsPanel {
                 });
                 return;
             }
+            lastClickedContainer.classList.add("hideItem");
             magazinePanelUl.querySelectorAll("li").forEach((li) => {
                 let a = li.querySelector("a");
                 let subMags = li.querySelectorAll("li");
@@ -157,7 +160,35 @@ class SubscriptionsPanel {
                 }
             }
         });
+        /** Detect when sidepanel is opened */
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.attributeName === "class") {
+                    const attributeValue = mutation.target.getAttribute(mutation.attributeName);
+                    if (attributeValue.includes("open")) {
+                        this.closeMobilePanel();
+                    }
+                }
+            });
+
+        });
+        observer.observe(document.getElementById("sidebar"), { attributes: true });
+
         /** Add subscription list */
+        const lastClickedContainer = document.createElement("div");
+        lastClickedContainer.className = "last-clicked-container";
+        lastClickedContainer.appendChild(Object.assign(document.createElement("h3"), {
+            innerText: "Recently viewed",
+        }));
+        const magazinePanelLastClickedUl = document.createElement("ul");
+        magazinePanelLastClickedUl.className = "fade-in last-clicked-list";
+        const settings = getSettings();
+        if (settings?.showLastClicked !== true) {
+            lastClickedContainer.classList.add("hideItem");
+        }
+        lastClickedContainer.appendChild(magazinePanelLastClickedUl);
+        magazinePanel.appendChild(lastClickedContainer);
+
         magazinePanel.appendChild(magazinePanelUl);
         const cache = new Cache();
         let cacheData = cache.get();
@@ -194,6 +225,12 @@ class SubscriptionsPanel {
         if (window.innerWidth <= 991.98 || document.body.classList.contains("subscription-panel-force-mobile")) {
             return false;
         }
+
+        const lastClickedH3 = document.querySelector(".last-clicked-container h3");
+        if (lastClickedH3) {
+            lastClickedH3.innerHTML = '<i class="fa-solid fa-clock-rotate-left"></i> Recent';
+        }
+
         if (document.body.classList.contains("sidebar-left")) {
             document.querySelector("#subscription-panel-collapse-button i").className = "fa-solid fa-chevron-left";
         } else {
@@ -202,7 +239,7 @@ class SubscriptionsPanel {
         const button = document.querySelector("#subscription-panel-collapse-button");
         button.title = "Show subscriptions";
         button.ariaLabel = "Show subscriptions";
-        document.querySelector(".subscription-panel-header").innerText = "Subs";
+        document.querySelector(".subscription-panel-header").innerHTML = '<i class="fa-solid fa-newspaper"></i> Subs';
         document.body.classList.add("subscription-panel-collapsed");
         return true;
     }
@@ -212,6 +249,10 @@ class SubscriptionsPanel {
             document.querySelector("#subscription-panel-collapse-button i").className = "fa-solid fa-chevron-right";
         } else {
             document.querySelector("#subscription-panel-collapse-button i").className = "fa-solid fa-chevron-left";
+        }
+        const lastClickedH3 = document.querySelector(".last-clicked-container h3");
+        if (lastClickedH3) {
+            lastClickedH3.innerText = "Recently viewed";
         }
         const button = document.querySelector("#subscription-panel-collapse-button");
         button.title = "Hide subscriptions";
@@ -234,6 +275,7 @@ class SubscriptionsPanel {
         if (!document.body.classList.contains("fixed-navbar")) {
             window.scrollTo(0, 0);
         }
+        document.getElementById("sidebar")?.classList.remove("open");
     }
 
     closeMobilePanel() {
@@ -270,44 +312,35 @@ class SubscriptionsPanel {
 
     addMagazinesToDOM(magazines) {
         /** Add magazines to the panel */
-        const magazinePanelUl = document.querySelector("#subscription-panel ul");
+        const magazinePanelUl = document.querySelector("#subscription-panel ul.subscription-list");
+        const lastClickedContainer = document.querySelector("#subscription-panel .last-clicked-container");
+        const magazinePanelLastClickedUl = document.querySelector("#subscription-panel ul.last-clicked-list");
         magazinePanelUl.innerHTML = "";
+        magazinePanelLastClickedUl.innerHTML = "";
+        const settings = getSettings();
+        if (settings?.showLastClicked === true) {
+            lastClickedContainer.classList.remove("hideItem");
+            let lastMagazines = [...magazines].sort((a, b) => {
+                return b.getClickTime() - a.getClickTime();
+            }).slice(0, 4);
 
-        magazines.forEach(mag => {
-            if (mag?.type === "group") {
-                let li = document.createElement("li");
-                li.classList.add("group");
-                let a = document.createElement("a");
-                a.className = "group-name";
-                a.href = "#";
-                a.title = mag.fullName;
-                a.ariaLabel = mag.fullName;
-                a.addEventListener("click", (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    li.classList.toggle("open");
-                    const icon = a.querySelector("i");
-                    if (li.classList.contains("open")) {
-                        a.setAttribute("aria-expanded", "true");
-                        icon.classList.remove("fa-box");
-                        icon.classList.add("fa-box-open");
-                    } else {
-                        a.setAttribute("aria-expanded", "false");
-                        icon.classList.remove("fa-box-open");
-                        icon.classList.add("fa-box");
-                    }
-                });
-                a.innerHTML = '<i class="fa-solid fa-box image"></i><span class="name">' + mag.name + '</span><span class="count">(' + mag.magazines.length + ")</span>";
-                li.appendChild(a);
-                let ul = document.createElement("ul");
-                mag.magazines.forEach((subMag) => {
-                    this.addMagazineToDOM(subMag, ul);
-                });
-                li.appendChild(ul);
-                magazinePanelUl.appendChild(li);
+            lastMagazines = lastMagazines.filter(mag => mag.getClickTime() > 0);
+            if (lastMagazines.length === 0) {
+                lastClickedContainer.classList.add("hideItem");
             } else {
-                this.addMagazineToDOM(mag, magazinePanelUl);
+                lastMagazines.forEach(mag => {
+                    let el = mag.copy().getElement();
+                    el.classList.add("last-clicked");
+                    magazinePanelLastClickedUl.appendChild(el);
+                });
             }
+
+        } else {
+            lastClickedContainer.classList.add("hideItem");
+        }
+        magazines.forEach(mag => {
+            let el = mag.getElement();
+            magazinePanelUl.appendChild(el);
         });
     }
 }

@@ -11,9 +11,19 @@ export function getSettings() {
     if (settingsObj.useGroups === undefined) {
         settingsObj.useGroups = true;
     }
+
+    if (settingsObj.showLastClicked === undefined) {
+        settingsObj.showLastClicked = true;
+    }
+
     return settingsObj;
 }
 
 export function saveSettings(settings) {
     localStorage.setItem("subscription-panel-settings", JSON.stringify(settings));
+}
+
+export function resetSettings() {
+    localStorage.removeItem("subscription-panel-settings");
+    localStorage.removeItem("subscription-panel-magazine-data");
 }

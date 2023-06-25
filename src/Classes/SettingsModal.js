@@ -1,4 +1,4 @@
-import {getSettings, saveSettings} from "../utils";
+import {getSettings, resetSettings, saveSettings} from "../utils";
 import Cache from "./Cache";
 
 class SettingsModal {
@@ -80,9 +80,18 @@ class SettingsModal {
                             <span class="description">Group magazines with the same name but from different instances.</span>
                         </label>
                         <label>
+                            <input type="checkbox" id="subscription-panel-show-last-clicked" />
+                            Show recently viewed
+                            <span class="description">Show recently viewed magazines.</span>
+                        </label>
+                        <label>
                             <input type="checkbox" id="subscription-panel-show-onboarding" />
                             Show onboarding
                             <span class="description">Show the onboarding step again on next load.</span>
+                        </label>
+                        <label class="danger">
+                            <input type="button" id="subscription-panel-reset" value="Reset settings"/>
+                            <span class="description">Removes all cached data and resets settings to default.</span>
                         </label>
                     </li>
             </div>
@@ -114,6 +123,19 @@ class SettingsModal {
         if (settings?.useGroups) {
             useGroupsEl.checked = true;
         }
+
+        const lastClickedEl = modal.querySelector("#subscription-panel-show-last-clicked");
+        if (settings?.showLastClicked) {
+            lastClickedEl.checked = true;
+        }
+
+        const resetEl = modal.querySelector("#subscription-panel-reset");
+        resetEl.addEventListener("click", (e) => {
+            const cache = new Cache();
+            cache.remove();
+            resetSettings();
+            window.location.reload();
+        });
 
         modal.querySelector(".subscription-panel-settings-modal .close").addEventListener("click", () => {
             this.close();
@@ -166,12 +188,21 @@ class SettingsModal {
             this.applySettings();
         });
         modal.querySelector("#subscription-panel-force-mobile").addEventListener("change", (e) => {
-                const settings = getSettings();
-                settings.forceMobile = !!e.target.checked;
-                saveSettings(settings);
-                this.applySettings();
-            }
-        );
+            const settings = getSettings();
+            settings.forceMobile = !!e.target.checked;
+            saveSettings(settings);
+            this.applySettings();
+        });
+        modal.querySelector("#subscription-panel-show-last-clicked").addEventListener("change", (e) => {
+            const settings = getSettings();
+            settings.showLastClicked = !!e.target.checked;
+            const subscriptionsHandler = this.subscriptionsPanel.subscriptionsHandler;
+            subscriptionsHandler.reload().then(() => {
+                this.subscriptionsPanel.addMagazinesToDOM(subscriptionsHandler.subscriptions, true);
+            });
+            saveSettings(settings);
+            this.applySettings();
+        });
     }
 
     applySettings() {
@@ -202,4 +233,5 @@ class SettingsModal {
         }
     }
 }
+
 export default SettingsModal;

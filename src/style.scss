@@ -56,6 +56,10 @@ body.rounded-edges {
   #subscription-panel-content {
     border-radius: 0 0 .5rem .5rem;
   }
+
+  .subscription-panel-modal .danger {
+    border-radius: 0.5rem;
+  }
 }
 
 
@@ -140,6 +144,14 @@ body.rounded-edges {
       label {
         display: block;
         margin-bottom: 0.5rem;
+
+        &.danger {
+          background-color: RGBA(255, 0, 0, 0.1);
+          border: 1px solid RGBA(255, 0, 0, 0.5);
+          padding: 0.5rem;
+          color: var(--kbin-section-text-color);
+          margin: 2em 0;
+        }
       }
 
       .description {
@@ -151,6 +163,15 @@ body.rounded-edges {
 
       input[type="checkbox"] {
         margin-right: 0.5rem;
+      }
+
+      input[type="button"] {
+        margin-right: 0.5rem;
+        padding: 0.5rem;
+
+        &:active {
+          opacity: 0.8;
+        }
       }
     }
   }
@@ -207,6 +228,10 @@ body.subscription-panel-collapsed.sidebar-left:not(.subscription-panel-force-mob
 
 body.subscription-panel-collapsed {
   #middle > .kbin-container #subscription-panel {
+    #subscription-panel-collapse-button {
+      margin: 0;
+      padding: 0 0.5em;
+    }
     li {
       font-size: 0.8em;
 
@@ -220,8 +245,13 @@ body.subscription-panel-collapsed {
     }
   }
 
-  &.subscription-panel-hide-on-collapse #middle > .kbin-container #subscription-panel ul {
-    display: none;
+  &.subscription-panel-hide-on-collapse #middle > .kbin-container {
+    #subscription-panel ul {
+      display: none;
+    }
+    .last-clicked-container {
+      display: none;
+    }
   }
 }
 
@@ -256,6 +286,18 @@ body.subscription-panel-collapsed:not(.subscription-panel-force-mobile) .sidebar
     width: 100%;
   }
 
+  .last-clicked-container {
+    border-bottom: var(--kbin-sidebar-header-border);
+
+    &.hideItem {
+      display: none;
+    }
+
+    h3 {
+      margin-top: 1em;
+    }
+  }
+
   ul {
     list-style: none;
     line-height: 2.5em;
@@ -266,7 +308,7 @@ body.subscription-panel-collapsed:not(.subscription-panel-force-mobile) .sidebar
     }
 
     li.fade-in {
-        animation: showItem 0.5s ease-in-out;
+      animation: showItem 0.5s ease-in-out;
     }
 
     li {
@@ -411,7 +453,7 @@ body.subscription-panel-open {
     width: 100%;
     overflow: hidden;
     position: fixed;
-    z-index: 2;
+    z-index: 5;
     top: 0;
     border-radius: 0 !important;
     border: none;

@@ -1,5 +1,8 @@
 import {getSettings} from "../utils";
 import Cache from "./Cache";
+import Magazine from "./Magazine";
+import Item from "./Item";
+import Group from "./Group";
 
 class SubscriptionsHandler {
     subscriptions;
@@ -21,18 +24,13 @@ class SubscriptionsHandler {
         magazines.forEach((mag) => {
                 let found = false;
                 this.subscriptions.some((sub, index) => {
-                    if (sub.url === mag.url) {
+                    if (sub.type === Item.TYPE.MAGAZINE && mag.type === Item.TYPE.MAGAZINE && sub.url === mag.url) {
                         found = true;
                     } else if (useGroups && sub.name.toLowerCase() === mag.name.toLowerCase()) {
-                        if (sub?.type === "group") {
+                        if (sub.type === Item.TYPE.GROUP) {
                             sub.magazines.push(mag);
                         } else {
-                            this.subscriptions[index] = {
-                                name: sub.name,
-                                fullName: sub.name,
-                                type: "group",
-                                magazines: [sub, mag]
-                            };
+                            this.subscriptions[index] = new Group(sub.name, [sub, mag]);
                         }
                         found = true;
                     }
@@ -58,7 +56,6 @@ class SubscriptionsHandler {
         const fetchURL = "https://kbin.social/settings/subscriptions/magazines?p=" + page;
         const fetchPromise = fetch(fetchURL)
         return fetchPromise.then((response) => {
-            console.log(response);
             /** Remove the spinner */
             const spinner = document.querySelector("#subscription-panel-spinner");
             if (spinner) {
@@ -72,15 +69,13 @@ class SubscriptionsHandler {
             let magazines = []
             /** Find subscriptions */
             magazinesElements.forEach((el) => {
-                let magA = el.querySelector("a")
-                let mag = {};
-                mag.fullName = magA.innerText;
-                const instanceName = mag.fullName.match(/@(.*)/);
-                mag.instanceName = instanceName ? instanceName[1] : undefined;
-                mag.name = mag.fullName.replace(/@(.*)/, "");
-                mag.url = magA.href;
-                mag.img = el.querySelector("figure img")?.src;
+                const mag = Magazine.fromElement(el);
                 magazines.push(mag);
+                /** If this is the current magazine, register the click time */
+                const currentMagazine = window.location.pathname.match(/\/m\/(.+?)(\/|$)/);
+                if (currentMagazine && currentMagazine[1] === mag.fullName) {
+                    mag.registerClickTime();
+                }
             });
             this.append(magazines);
             /** Fetch next page */
@@ -119,15 +114,13 @@ class SubscriptionsHandler {
                     let magazines = []
                     /** Find subscriptions */
                     magazinesElements.forEach((el) => {
-                        let magA = el.querySelector("a")
-                        let mag = {};
-                        mag.fullName = magA.innerText;
-                        const instanceName = mag.fullName.match(/@(.*)/);
-                        mag.instanceName = instanceName ? instanceName[1] : undefined;
-                        mag.name = mag.fullName.replace(/@(.*)/, "");
-                        mag.url = magA.href;
-                        mag.img = el.querySelector("figure img")?.src;
+                        const mag = Magazine.fromElement(el);
                         magazines.push(mag);
+                        console.log("Checking if we are on the magazine page", window.location.pathname, mag.url);
+                        if (window.location && window.location.pathname === mag.url) {
+                            console.log("Registering click time");
+                            mag.registerClickTime();
+                        }
                     });
                     this.append(magazines);
                     /** Fetch next page */
