@@ -258,7 +258,7 @@ class SubscriptionsPanel {
             mag.enableEditMode();
         });
         const editButton = document.getElementById("subscription-panel-edit-button");
-        editButton.innerHTML = '<i class="fa-solid fa-check"></i> Save';
+        editButton.innerHTML = '<i class="fa-solid fa-check"></i> Done';
         editButton.classList.add("active");
     }
 
