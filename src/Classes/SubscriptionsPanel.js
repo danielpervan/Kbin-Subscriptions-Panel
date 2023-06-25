@@ -55,21 +55,6 @@ class SubscriptionsPanel {
             let filter = e.target.value.toLowerCase();
             if (filter.length === 0) {
                 lastClickedContainer.classList.remove("hideItem");
-                /*magazinePanelUl.querySelectorAll("li").forEach((li) => {
-                    if (li.classList.contains("hideItem")) {
-                        li.classList.remove("hideItem");
-                        li.addEventListener("animationend", () => {
-                            li.classList.remove("fade-in");
-                        });
-                        li.classList.add("fade-in");
-                    }
-                    if (li.classList.contains("open") && !this.editMode) {
-                        li.classList.remove("open");
-                        const i = li.querySelector("i");
-                        i.classList.remove("fa-box-open");
-                        i.classList.add("fa-box");
-                    }
-                });*/
                 this.subscriptionsHandler.subscriptions.forEach(mag => {
                     mag.show(true);
                     if (mag.type === Magazine.TYPE.GROUP) {
@@ -104,41 +89,6 @@ class SubscriptionsPanel {
                     }
                 }
             });
-            /* magazinePanelUl.querySelectorAll("li").forEach((li) => {
-                 let a = li.querySelector("a");
-                 let subMags = li.querySelectorAll("li");
-                 if (a.innerText.toLowerCase().indexOf(filter) > -1) {
-                     if (li.classList.contains("hideItem")) {
-                         li.classList.remove("hideItem");
-                         li.addEventListener("animationend", () => {
-                             li.classList.remove("fade-in");
-                         });
-                         li.classList.add("fade-in");
-                     }
-                 } else {
-                     let found = false;
-                     if (subMags?.length > 0) {
-                         subMags.forEach(subMag => {
-                             if (subMag.innerText.toLowerCase().indexOf(filter) > -1) {
-                                 if (li.classList.contains("hideItem")) {
-                                     li.classList.add("fade-in");
-                                     li.classList.remove("hideItem");
-                                 }
-                                 found = true;
-                                 li.classList.add("open");
-                                 const i = li.querySelector("i");
-                                 i.classList.remove("fa-box");
-                                 i.classList.add("fa-box-open");
-
-                             }
-                         });
-                     }
-                     if (!found) {
-                         li.classList.add("hideItem");
-                         li.classList.add("fade-in");
-                     }
-                 }
-             });*/
         });
 
         const searchBoxClear = document.createElement("span");
