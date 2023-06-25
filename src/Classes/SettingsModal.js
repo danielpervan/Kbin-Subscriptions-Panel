@@ -130,7 +130,7 @@ class SettingsModal {
         }
 
         const resetEl = modal.querySelector("#subscription-panel-reset");
-        resetEl.addEventListener("click", (e) => {
+        resetEl.addEventListener("click", () => {
             const cache = new Cache();
             cache.remove();
             resetSettings();
