@@ -1,7 +1,6 @@
 import Cache from "./Cache";
 import {getSettings, saveSettings} from "../utils";
 import subscriptionsHandler from "./SubscriptionsHandler";
-import Magazine from "./Magazine";
 import SearchBox from "./SearchBox";
 
 class SubscriptionsPanel {

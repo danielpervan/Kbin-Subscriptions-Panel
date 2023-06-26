@@ -13,7 +13,6 @@ class SearchBox {
 
     clear() {
         this.doSearch("");
-        this.#containerElement.querySelector(".search-box-clear")?.classList.remove("active");
     }
 
     set editMode(editMode) {
@@ -32,6 +31,7 @@ class SearchBox {
         if (filter.length > 0) {
             this.#containerElement.querySelector(".search-box-clear")?.classList.add("active");
         } else {
+            this.#containerElement.querySelector(".search-box-clear")?.classList.remove("active");
             lastClickedContainer.classList.remove("hideItem");
             this.subscriptionsHandler.subscriptions.forEach(mag => {
                 if (mag.type === Magazine.TYPE.GROUP) {

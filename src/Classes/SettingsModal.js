@@ -37,6 +37,28 @@ class SettingsModal {
         }
     }
 
+    /** Apply settings to the subscriptions panel
+     * @param id {string} The id of the element
+     * @param setting {string} The setting to apply
+     * @param invert {boolean} Invert checked state from settings
+     * @param callback {function} Callback to run when checkbox is changed
+     */
+    registerCheckbox(id, setting, invert = false, callback = null) {
+        const element = document.getElementById(id);
+        const settings = getSettings();
+        if (settings?.[setting] === true) {
+            element.checked = !invert;
+        }
+        element.addEventListener("change", (e) => {
+            const settings = getSettings();
+            settings[setting] = !!e.target.checked;
+            saveSettings(settings);
+            if (callback) {
+                callback(element.checked);
+            }
+        });
+    }
+
     show() {
         const settings = getSettings();
         const modal = document.createElement("div");
@@ -84,6 +106,11 @@ class SettingsModal {
                             <span class="description">Show recently viewed magazines.</span>
                         </label>
                         <label>
+                            <input type="checkbox" id="subscription-panel-sticky" />
+                            Sticky panel
+                            <span class="description">Make the panel stick to the top and scroll independently.</span>
+                        </label>
+                        <label>
                             <input type="checkbox" id="subscription-panel-show-onboarding" />
                             Show onboarding
                             <span class="description">Show the onboarding step again on next load.</span>
@@ -127,6 +154,10 @@ class SettingsModal {
         if (settings?.showLastClicked) {
             lastClickedEl.checked = true;
         }
+
+        this.registerCheckbox("subscription-panel-sticky", "sticky", false , (checked) => {
+            this.applySettings();
+        });
 
         const resetEl = modal.querySelector("#subscription-panel-reset");
         resetEl.addEventListener("click", () => {
@@ -229,6 +260,12 @@ class SettingsModal {
         } else {
             document.body.classList.remove("subscription-panel-force-mobile");
             this.subscriptionsPanel.closeMobilePanel();
+        }
+
+        if (settings?.sticky) {
+            document.body.classList.add("subscription-panel-sticky");
+        } else {
+            document.body.classList.remove("subscription-panel-sticky");
         }
     }
 }
