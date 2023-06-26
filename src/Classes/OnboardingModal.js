@@ -8,7 +8,6 @@ class OnboardingModal {
     init() {
         const settings = getSettings();
         if (!settings?.onboardingDone) {
-            console.log("Onboarding not done yet, showing onboarding modal");
             settings.onboardingDone = true;
             saveSettings(settings);
             this.show();

@@ -17,16 +17,28 @@ class SubscriptionsHandler {
     }
 
     sort() {
-        /** Sort magazines by starred then name */
-        this.subscriptions.sort((a, b) => {
+        const sortFunction = (a, b) => {
             if (a.isStarred() && !b.isStarred()) {
                 return -1;
             } else if (!a.isStarred() && b.isStarred()) {
                 return 1;
             } else {
-                return a.name.localeCompare(b.name);
+                return a.fullName.localeCompare(b.fullName);
             }
-        })
+        }
+        /** Sort magazines by starred then name */
+        this.subscriptions.sort((a, b) => {
+            return sortFunction(a, b);
+        });
+
+        /** Sort groups by starred then name */
+        this.subscriptions.forEach((sub) => {
+            if (sub.type === Item.TYPE.GROUP) {
+                sub.magazines.sort((a, b) => {
+                    return sortFunction(a, b);
+                });
+            }
+        });
     }
 
     append(magazines) {
@@ -126,9 +138,7 @@ class SubscriptionsHandler {
                     magazinesElements.forEach((el) => {
                         const mag = Magazine.fromElement(el);
                         magazines.push(mag);
-                        console.log("Checking if we are on the magazine page", window.location.pathname, mag.url);
                         if (window.location && window.location.pathname === mag.url) {
-                            console.log("Registering click time");
                             mag.registerClickTime();
                         }
                     });

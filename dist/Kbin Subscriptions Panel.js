@@ -900,13 +900,23 @@
           return this.load(1);
         }
         sort() {
-          this.subscriptions.sort((a, b) => {
+          const sortFunction = (a, b) => {
             if (a.isStarred() && !b.isStarred()) {
               return -1;
             } else if (!a.isStarred() && b.isStarred()) {
               return 1;
             } else {
-              return a.name.localeCompare(b.name);
+              return a.fullName.localeCompare(b.fullName);
+            }
+          };
+          this.subscriptions.sort((a, b) => {
+            return sortFunction(a, b);
+          });
+          this.subscriptions.forEach((sub) => {
+            if (sub.type === Item_default.TYPE.GROUP) {
+              sub.magazines.sort((a, b) => {
+                return sortFunction(a, b);
+              });
             }
           });
         }
@@ -991,9 +1001,7 @@
                 magazinesElements.forEach((el) => {
                   const mag = Magazine_default.fromElement(el);
                   magazines.push(mag);
-                  console.log("Checking if we are on the magazine page", window.location.pathname, mag.url);
                   if (window.location && window.location.pathname === mag.url) {
-                    console.log("Registering click time");
                     mag.registerClickTime();
                   }
                 });
@@ -1140,6 +1148,7 @@
       init_utils();
       init_SubscriptionsHandler();
       init_SearchBox();
+      init_Magazine();
       SubscriptionsPanel = class {
         subscriptionsHandler;
         containerElement;
@@ -1368,7 +1377,13 @@
               lastClickedContainer.classList.add("hideItem");
             } else {
               lastMagazines.forEach((mag) => {
-                let el = mag.copy().getElement();
+                const newMag = mag.copy();
+                if (newMag.type === Magazine_default.TYPE.GROUP) {
+                  newMag.magazines.sort((a, b) => {
+                    return b.getClickTime() - a.getClickTime();
+                  });
+                }
+                let el = newMag.getElement();
                 el.classList.add("last-clicked");
                 magazinePanelLastClickedUl.appendChild(el);
               });
@@ -1398,7 +1413,6 @@
         init() {
           const settings = getSettings();
           if (!settings?.onboardingDone) {
-            console.log("Onboarding not done yet, showing onboarding modal");
             settings.onboardingDone = true;
             saveSettings(settings);
             this.show();

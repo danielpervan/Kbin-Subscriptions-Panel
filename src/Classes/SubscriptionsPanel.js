@@ -2,6 +2,7 @@ import Cache from "./Cache";
 import {getSettings, saveSettings} from "../utils";
 import subscriptionsHandler from "./SubscriptionsHandler";
 import SearchBox from "./SearchBox";
+import Magazine from "./Magazine";
 
 class SubscriptionsPanel {
     subscriptionsHandler;
@@ -257,12 +258,21 @@ class SubscriptionsPanel {
                 return b.getClickTime() - a.getClickTime();
             }).slice(0, 4);
 
+
+
             lastMagazines = lastMagazines.filter(mag => mag.getClickTime() > 0);
             if (lastMagazines.length === 0) {
                 lastClickedContainer.classList.add("hideItem");
             } else {
                 lastMagazines.forEach(mag => {
-                    let el = mag.copy().getElement();
+                    const newMag = mag.copy();
+                    /** Sort groups */
+                    if (newMag.type === Magazine.TYPE.GROUP) {
+                        newMag.magazines.sort((a, b) => {
+                            return b.getClickTime() - a.getClickTime();
+                        });
+                    }
+                    let el = newMag.getElement();
                     el.classList.add("last-clicked");
                     magazinePanelLastClickedUl.appendChild(el);
                 });
