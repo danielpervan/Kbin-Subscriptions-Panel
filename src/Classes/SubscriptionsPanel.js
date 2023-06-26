@@ -81,7 +81,7 @@ class SubscriptionsPanel {
 
         magazinePanelContainer.addEventListener("click", (e) => {
             if (e.target === magazinePanelContainer) {
-                if (document.body.classList.contains("subscription-panel-open") && document.body.classList.contains("subscription-panel-force-mobile")) {
+                if (document.body.classList.contains("subscription-panel-open") ) {
                     this.closeMobilePanel();
                 }
             }

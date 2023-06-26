@@ -1,5 +1,7 @@
-body.extend-width:not(.subscription-panel-force-mobile) .kbin-container {
-  max-width: 1620px;
+body.extend-width {
+  &:not(.subscription-panel-force-mobile, .subscription-panel-open) .kbin-container {
+    max-width: 1620px;
+  }
 }
 
 .subscription-panel-modal {
@@ -191,6 +193,7 @@ body.subscription-panel-sticky:not(.subscription-panel-open) {
   left: 0;
   margin: 0.5rem;
   padding: 0.5rem;
+  z-index: 5;
   color: var(--kbin-section-text-color);
   font-size: 0.8em;
   cursor: pointer;
@@ -332,16 +335,16 @@ body.subscription-panel-collapsed #subscription-panel h3:hover #subscription-pan
   transform: translateX(-2px);
 }
 
-body:not(.subscription-panel-force-mobile) #middle > .kbin-container {
+body:not(.subscription-panel-force-mobile, .subscription-panel-open) #middle > .kbin-container {
   grid-template-areas: "subscription-panel main sidebar";
   grid-template-columns: minmax(200px, 1fr) 3fr 1fr;
 }
 
-body.subscription-panel-collapsed:not(.subscription-panel-force-mobile) #middle > .kbin-container {
+body.subscription-panel-collapsed:not(.subscription-panel-force-mobile, .subscription-panel-open) #middle > .kbin-container {
   grid-template-columns: minmax(100px, 120px) 3fr 1fr;
 }
 
-body.subscription-panel-collapsed.sidebar-left:not(.subscription-panel-force-mobile) #middle > .kbin-container {
+body.subscription-panel-collapsed.sidebar-left:not(.subscription-panel-force-mobile, .subscription-panel-open) #middle > .kbin-container {
   grid-template-columns: 1fr 3fr minmax(100px, 120px);
 }
 
@@ -350,6 +353,7 @@ body.subscription-panel-collapsed {
     #subscription-panel-edit-button {
       display: none;
     }
+
     #subscription-panel-collapse-button {
       margin: 0;
       padding: 0 0.5em;
@@ -375,12 +379,12 @@ body.subscription-panel-collapsed {
   }
 }
 
-body:not(.subscription-panel-force-mobile) .sidebar-left #middle > .kbin-container {
+body:not(.subscription-panel-force-mobile, .subscription-panel-open) .sidebar-left #middle > .kbin-container {
   grid-template-areas: "sidebar main subscription-panel";
   grid-template-columns: 1fr 3fr minmax(200px, 1fr);
 }
 
-body.subscription-panel-collapsed:not(.subscription-panel-force-mobile) .sidebar-left #middle > .kbin-container {
+body.subscription-panel-collapsed:not(.subscription-panel-force-mobile, .subscription-panel-open) .sidebar-left #middle > .kbin-container {
   grid-template-columns: 1fr 3fr minmax(100px, 120px);
 }
 
@@ -673,30 +677,33 @@ body.subscription-panel-open {
     margin: 0;
   }
 
-  &.subscription-panel-force-mobile #middle > .kbin-container #subscription-panel {
-    overflow: hidden;
-    border-radius: 0 !important;
-    border: none;
-    background: RGBA(0, 0, 0, 0.5);
-    backdrop-filter: blur(2px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  &.subscription-panel-force-mobile,
+  &.subscription-panel-open {
+    #middle > .kbin-container #subscription-panel {
+      overflow: hidden;
+      border-radius: 0 !important;
+      border: none;
+      background: RGBA(0, 0, 0, 0.5);
+      backdrop-filter: blur(2px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
-    #subscription-panel-content {
-      height: 100%;
-      overflow: auto;
-      padding: 1em 10em;
-      padding-bottom: 100px !important;
-      position: fixed;
-      top: 49px;
-      width: fit-content;
-      margin: 2em 0 0;
-      animation: showMobileSubscriptionPanel 0.2s ease-out;
-    }
+      #subscription-panel-content {
+        height: 100%;
+        overflow: auto;
+        padding: 1em 10em;
+        padding-bottom: 100px !important;
+        position: fixed;
+        top: 49px;
+        width: fit-content;
+        margin: 2em 0 0;
+        animation: showMobileSubscriptionPanel 0.2s ease-out;
+      }
 
-    ul {
-      animation: showMobileSubscriptionPanelUL 0.2s ease-out;
+      ul {
+        animation: showMobileSubscriptionPanelUL 0.2s ease-out;
+      }
     }
   }
 
@@ -709,8 +716,11 @@ body.subscription-panel-open {
   }
 }
 
-body.subscription-panel-force-mobile #subscription-panel-collapse-button {
-  display: none;
+body.subscription-panel-force-mobile,
+body.subscription-panel-open {
+  #subscription-panel-collapse-button {
+    display: none;
+  }
 }
 
 #header menu li a.subscription-panel-mobile-button {
@@ -719,7 +729,8 @@ body.subscription-panel-force-mobile #subscription-panel-collapse-button {
   transition: border-bottom 0.2s ease-in-out;
 }
 
-body.subscription-panel-force-mobile {
+body.subscription-panel-force-mobile,
+body.subscription-panel-open {
   #header menu li a.subscription-panel-mobile-button {
     display: block;
   }
@@ -773,6 +784,15 @@ a.subscription-panel-mobile-button i {
   #subscription-panel-settings-button {
     right: 1em;
   }
+
+  #subscription-panel-edit-button {
+    right: 4em;
+    left: unset;
+  }
+
+  #subscription-panel.edit-mode #subscription-panel-edit-button {
+    right: 1em;
+  }
 }
 
 /** Touch devices */
@@ -780,10 +800,15 @@ a.subscription-panel-mobile-button i {
   #header menu li a.subscription-panel-mobile-button:hover {
     border-bottom: 3px solid transparent;
   }
+  #subscription-panel-settings-button:hover i,
+  #subscription-panel-edit-button:hover i {
+    transform: none !important;
+  }
 }
 
 @media (pointer: coarse) {
-  #subscription-panel-settings-button {
+  #subscription-panel-settings-button,
+  #subscription-panel-edit-button {
     font-size: 1.2em;
   }
 }
