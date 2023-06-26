@@ -2,6 +2,7 @@ import Cache from "./Cache";
 import {getSettings, saveSettings} from "../utils";
 import subscriptionsHandler from "./SubscriptionsHandler";
 import Magazine from "./Magazine";
+import SearchBox from "./SearchBox";
 
 class SubscriptionsPanel {
     subscriptionsHandler;
@@ -47,77 +48,9 @@ class SubscriptionsPanel {
         magazinePanelContainer.appendChild(magazinePanel);
         kbinContainer.appendChild(magazinePanelContainer);
         /** Add search box */
-        const searchBox = document.createElement("input");
-        searchBox.type = "text";
-        searchBox.id = "subscription-panel-search";
-        searchBox.placeholder = "Filter";
-        searchBox.addEventListener("input", (e) => {
-            let filter = e.target.value.toLowerCase();
-            if (filter.length === 0) {
-                lastClickedContainer.classList.remove("hideItem");
-                this.subscriptionsHandler.subscriptions.forEach(mag => {
-                    mag.show(true);
-                    if (mag.type === Magazine.TYPE.GROUP) {
-                        mag.close();
-                    }
-                });
-                return;
-            }
-            lastClickedContainer.classList.add("hideItem");
-            this.subscriptionsHandler.subscriptions.forEach(mag => {
-                if (mag.type === Magazine.TYPE.GROUP) {
-                    mag.open();
-                    let subMagFound = false;
-                    mag.magazines.forEach(subMag => {
-                        if (subMag.search(filter, this.editMode)) {
-                            subMagFound = true;
-                            subMag.show(true);
-                        } else {
-                            subMag.hide(true);
-                        }
-                    });
-                    if (subMagFound) {
-                        mag.show(true);
-                    } else {
-                        mag.hide(true);
-                    }
-                } else if (mag.type === Magazine.TYPE.MAGAZINE) {
-                    if (mag.search(filter, this.editMode)) {
-                        mag.show(true);
-                    } else {
-                        mag.hide(true);
-                    }
-                }
-            });
-        });
-
-        const searchBoxClear = document.createElement("span");
-        searchBoxClear.className = "search-box-clear";
-        searchBoxClear.innerHTML = '<i class="fa-solid fa-times"></i>';
-        searchBoxClear.addEventListener("click", () => {
-            searchBox.value = "";
-            searchBox.dispatchEvent(new Event("input"));
-        });
-
-        searchBox.addEventListener("input", () => {
-            if (searchBox.value.length > 0) {
-                searchBoxClear.classList.add("active");
-            } else {
-                searchBoxClear.classList.remove("active");
-            }
-        });
-        searchBox.addEventListener("keydown", (e) => {
-            if (e.key === "Escape") {
-                searchBox.value = "";
-                searchBox.dispatchEvent(new Event("input"));
-            }
-        });
-
-        const searchBoxContainer = document.createElement("div");
-        searchBoxContainer.className = "search-box-container";
-        searchBoxContainer.appendChild(searchBox);
-        searchBoxContainer.appendChild(searchBoxClear);
-        magazinePanel.appendChild(searchBoxContainer);
+        const searchBox = new SearchBox(this.subscriptionsHandler, magazinePanelContainer);
+        this.searchBox = searchBox;
+        magazinePanel.appendChild(searchBox.getElement());
 
         /** Add collapse button */
         const collapseButton = document.createElement("span");
@@ -207,6 +140,7 @@ class SubscriptionsPanel {
         this.subscriptionsHandler.subscriptions.forEach((mag) => {
             mag.enableEditMode();
         });
+        this.searchBox.editMode = true;
         const editButton = document.getElementById("subscription-panel-edit-button");
         editButton.innerHTML = '<i class="fa-solid fa-check"></i> Done';
         editButton.classList.add("active");
@@ -223,9 +157,8 @@ class SubscriptionsPanel {
         const editButton = document.getElementById("subscription-panel-edit-button");
         editButton.innerHTML = '<i class="fa-solid fa-pencil"></i>';
         editButton.classList.remove("active");
-        const searchBox = document.querySelector("#subscription-panel-search");
-        searchBox.value = "";
-        searchBox.dispatchEvent(new Event("input"));
+        this.searchBox.editMode = false;
+        this.searchBox.clear();
     }
 
     toggleEditMode() {

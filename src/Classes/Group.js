@@ -172,7 +172,11 @@ class Group extends Item {
     }
 
     show(fadeIn = false) {
-        super.show();
+        super.show(fadeIn);
+    }
+
+    showAll(fadeIn = false) {
+        super.show(fadeIn);
         if (!this.element) {
             return;
         }
