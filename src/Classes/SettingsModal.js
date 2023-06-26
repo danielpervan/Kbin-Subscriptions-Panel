@@ -155,7 +155,7 @@ class SettingsModal {
             lastClickedEl.checked = true;
         }
 
-        this.registerCheckbox("subscription-panel-sticky", "sticky", false , (checked) => {
+        this.registerCheckbox("subscription-panel-sticky", "sticky", false , () => {
             this.applySettings();
         });
 
