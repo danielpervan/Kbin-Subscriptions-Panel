@@ -716,6 +716,12 @@ body.subscription-panel-open {
   }
 }
 
+body.subscription-panel-force-mobile:not(.subscription-panel-open) {
+  #middle > .kbin-container #subscription-panel {
+    display: none;
+  }
+}
+
 body.subscription-panel-force-mobile,
 body.subscription-panel-open {
   #subscription-panel-collapse-button {
