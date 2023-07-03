@@ -28,6 +28,24 @@ class SettingsModal {
         window.addEventListener("open-subscriptions-panel-settings", () => {
             this.show();
         });
+
+        /** Check for KUP */
+        setTimeout(() => {
+            const KUP = document.KUP;
+            const settingsPanel = KUP?.settingsPanel;
+            const SettingsPanelBooleanRow = KUP?.components?.SettingsPanelButtonRow;
+            const SettingsPanelSection = KUP?.components?.SettingsPanelSection;
+            if (settingsPanel && SettingsPanelBooleanRow && SettingsPanelSection) {
+                const section = new SettingsPanelSection("Subscriptions Panel");
+                section.addSettingsRows([new SettingsPanelBooleanRow("Open settings", {
+                    label: "Open",
+                    onClick: () => {
+                        window.dispatchEvent(new CustomEvent("open-subscriptions-panel-settings"));
+                    }
+                })]);
+                settingsPanel.addSection(section);
+            }
+        }, 100);
     }
 
     close() {
