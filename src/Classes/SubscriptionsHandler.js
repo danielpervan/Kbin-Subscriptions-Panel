@@ -75,7 +75,7 @@ class SubscriptionsHandler {
     load(page) {
         page = page || 1;
         /** Fetch the subscriptions page */
-        const fetchURL = "https://kbin.social/settings/subscriptions/magazines?p=" + page;
+        const fetchURL = "/settings/subscriptions/magazines?p=" + page;
         const fetchPromise = fetch(fetchURL)
         return fetchPromise.then((response) => {
             /** Remove the spinner */
@@ -89,6 +89,11 @@ class SubscriptionsHandler {
             let dom = new DOMParser().parseFromString(pageContent, 'text/html');
             let magazinesElements = dom.querySelectorAll(".section.magazines.magazines-columns ul>li");
             let magazines = []
+            if (magazinesElements.length === 0) {
+                /** No subscriptions */
+                document.querySelector("#subscription-panel-content").appendChild(document.createTextNode("No subscriptions found"));
+                return Promise.resolve();
+            }
             /** Find subscriptions */
             magazinesElements.forEach((el) => {
                 const mag = Magazine.fromElement(el);

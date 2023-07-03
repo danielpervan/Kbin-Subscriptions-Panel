@@ -15,11 +15,8 @@ class SubscriptionsPanel {
     }
 
     init() {
-        const loginElement = document.querySelector(".login");
-        if (loginElement.href.endsWith("/login")) {
-            return;
-        }
         /** Create the subscriptions panel */
+        document.body.classList.add("subscription-panel-injected");
         const kbinContainer = document.querySelector("#middle > .kbin-container");
         const magazinePanelContainer = document.createElement("div");
         this.containerElement = magazinePanelContainer;

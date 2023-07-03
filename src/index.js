@@ -4,9 +4,12 @@ import SubscriptionsPanel from "./Classes/SubscriptionsPanel";
 import OnboardingModal from "./Classes/OnboardingModal";
 
 /** Do the stuff */
-const subscriptionsPanel = new SubscriptionsPanel();
-const settingsModal = new SettingsModal(subscriptionsPanel);
-const onboardingModal = new OnboardingModal(settingsModal);
-subscriptionsPanel.init();
-settingsModal.init();
-onboardingModal.init();
+const loginElement = document.querySelector(".login");
+if (!loginElement.href.endsWith("/login")) {
+    const subscriptionsPanel = new SubscriptionsPanel();
+    const settingsModal = new SettingsModal(subscriptionsPanel);
+    const onboardingModal = new OnboardingModal(settingsModal);
+    subscriptionsPanel.init();
+    settingsModal.init();
+    onboardingModal.init();
+}
