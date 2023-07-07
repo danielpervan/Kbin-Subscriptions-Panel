@@ -75,7 +75,7 @@ class SubscriptionsHandler {
     load(page) {
         page = page || 1;
         /** Fetch the subscriptions page */
-        const fetchURL = "/settings/subscriptions/magazines?p=" + page;
+        const fetchURL = window.location.origin + "/settings/subscriptions/magazines?p=" + page;
         const fetchPromise = fetch(fetchURL)
         return fetchPromise.then((response) => {
             /** Remove the spinner */

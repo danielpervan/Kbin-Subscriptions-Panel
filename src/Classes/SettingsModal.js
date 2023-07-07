@@ -81,6 +81,7 @@ class SettingsModal {
         const settings = getSettings();
         const modal = document.createElement("div");
         this.modalElement = modal;
+        const version = GM_info.script.version || "Unknown";
         modal.className = "subscription-panel-settings-modal subscription-panel-modal";
         modal.innerHTML = `
         <div class="subscription-panel-settings-modal-content subscription-panel-modal-content">
@@ -89,6 +90,7 @@ class SettingsModal {
                     <i class="fa-solid fa-times"></i>
                 </span>
                 <h2>Subscriptions Panel Settings</h2>
+                <h3>Version ${version}</h3>
             </div>
             <div class="subscription-panel-settings-modal-body">
                 <ul>
