@@ -750,7 +750,7 @@ body.subscription-panel-injected {
   &.subscription-panel-force-mobile,
   &.subscription-panel-open {
     #header menu li a.subscription-panel-mobile-button {
-      display: block;
+      display: flex;
     }
 
     #subscription-panel-collapse-button {
@@ -764,7 +764,7 @@ body.subscription-panel-injected {
 
   @media (max-width: 991.98px) {
     #header menu li a.subscription-panel-mobile-button {
-      display: block;
+      display: flex;
     }
 
     & #middle > .kbin-container, body.subscription-panel-collapsed #middle > .kbin-container {

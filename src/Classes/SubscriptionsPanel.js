@@ -128,6 +128,10 @@ class SubscriptionsPanel {
         this.subscriptionsHandler.load().then(() => {
             this.addMagazinesToDOM(this.subscriptionsHandler.subscriptions, true);
         });
+
+        window.addEventListener("hide-all-modals", () => {
+            this.closeMobilePanel();
+        });
     }
 
     enableEditMode() {
@@ -230,6 +234,7 @@ class SubscriptionsPanel {
     }
 
     openMobilePanel() {
+        window.dispatchEvent(new Event("hide-all-modals"));
         document.body.classList.add("subscription-panel-open");
         if (!document.body.classList.contains("fixed-navbar")) {
             window.scrollTo(0, 0);
