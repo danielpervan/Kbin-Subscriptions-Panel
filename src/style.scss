@@ -747,6 +747,10 @@ body.subscription-panel-injected {
     transition: border-bottom 0.2s ease-in-out;
   }
 
+  &.subscription-panel-alternative-menu:not(.subscription-panel-force-mobile) a.subscription-panel-mobile-button {
+    display: none !important;
+  }
+
   &.subscription-panel-force-mobile,
   &.subscription-panel-open {
     #header menu li a.subscription-panel-mobile-button {
@@ -760,6 +764,25 @@ body.subscription-panel-injected {
 
   a.subscription-panel-mobile-button i {
     font-size: .85rem;
+  }
+
+  .subscription-panel-mobile-close-button-alt {
+    position: relative;
+    top: -.5em;
+    font-size: 2em;
+    display: none;
+  }
+
+  &.subscription-panel-alternative-menu .subscription-panel-mobile-button-alt {
+    display: block;
+  }
+
+  &.subscription-panel-alternative-menu.subscription-panel-open .subscription-panel-mobile-close-button-alt {
+    display: block;
+  }
+
+  .subscription-panel-mobile-button-alt {
+    display: none;
   }
 
   @media (max-width: 991.98px) {

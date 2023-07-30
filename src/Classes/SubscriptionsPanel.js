@@ -15,6 +15,7 @@ class SubscriptionsPanel {
     }
 
     init() {
+        const settings = getSettings();
         /** Create the subscriptions panel */
         document.body.classList.add("subscription-panel-injected");
         const kbinContainer = document.querySelector("#middle > .kbin-container");
@@ -61,28 +62,59 @@ class SubscriptionsPanel {
         title.appendChild(collapseButton);
 
         /** Add mobile open button */
-        const menu = document.querySelector(".kbin-container > menu");
-        const mobileButtonLi = document.createElement("li");
-        const mobileButton = document.createElement("a");
-        mobileButton.className = "subscription-panel-mobile-button";
-        mobileButton.title = "Subscriptions";
-        mobileButton.ariaLabel = "Subscriptions";
-        mobileButton.href = "#";
-        mobileButton.innerHTML = '<i class="fa-solid fa-newspaper"></i>';
-        mobileButton.addEventListener("click", (e) => {
+        if (settings?.forceMobile || !settings?.alternativeMenu) {
+            const menu = document.querySelector(".kbin-container > menu");
+            const mobileButtonLi = document.createElement("li");
+            const mobileButton = document.createElement("a");
+            mobileButton.className = "subscription-panel-mobile-button";
+            mobileButton.title = "Subscriptions";
+            mobileButton.ariaLabel = "Subscriptions";
+            mobileButton.href = "#";
+            mobileButton.innerHTML = '<i class="fa-solid fa-newspaper"></i>';
+            mobileButton.addEventListener("click", (e) => {
+                this.toggleOpenMobilePanel();
+                e.preventDefault();
+            });
+            mobileButtonLi.appendChild(mobileButton);
+            menu.insertBefore(mobileButtonLi, menu.firstChild);
+
+            magazinePanelContainer.addEventListener("click", (e) => {
+                if (e.target === magazinePanelContainer) {
+                    if (document.body.classList.contains("subscription-panel-open")) {
+                        this.closeMobilePanel();
+                    }
+                }
+            });
+        }
+
+        /** Add alternative mobile menu button */
+        const altMobileButton = Object.assign(document.createElement("button"), {
+            className: "subscription-panel-mobile-button-alt btn btn__secondary",
+            title: "Subscriptions",
+            ariaLabel: "Subscriptions",
+            innerHTML: '<i class="fa-solid fa-newspaper"></i>',
+        });
+        altMobileButton.addEventListener("click", (e) => {
             this.toggleOpenMobilePanel();
             e.preventDefault();
         });
-        mobileButtonLi.appendChild(mobileButton);
-        menu.insertBefore(mobileButtonLi, menu.firstChild);
+        const mobileMenu = document.querySelector(".section.options--top");
+        mobileMenu.insertBefore(altMobileButton, mobileMenu.firstChild.nextSibling.nextSibling);
 
-        magazinePanelContainer.addEventListener("click", (e) => {
-            if (e.target === magazinePanelContainer) {
-                if (document.body.classList.contains("subscription-panel-open") ) {
-                    this.closeMobilePanel();
-                }
-            }
+        const altCloseButton = Object.assign(document.createElement("a"), {
+            className: "subscription-panel-mobile-close-button-alt",
+            title: "Close",
+            ariaLabel: "Close",
+            innerHTML: '<i class="fa-solid fa-times"></i>',
+            href: "#",
         });
+        altCloseButton.addEventListener("click", (e) => {
+            this.closeMobilePanel();
+            e.preventDefault();
+        });
+
+        magazinePanel.insertBefore(altCloseButton, magazinePanel.firstChild);
+
         /** Detect when sidebar is opened */
         const observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
@@ -105,7 +137,6 @@ class SubscriptionsPanel {
         }));
         const magazinePanelLastClickedUl = document.createElement("ul");
         magazinePanelLastClickedUl.className = "fade-in last-clicked-list";
-        const settings = getSettings();
         if (settings?.showLastClicked !== true) {
             lastClickedContainer.classList.add("hideItem");
         }
@@ -259,7 +290,6 @@ class SubscriptionsPanel {
             let lastMagazines = [...magazines].sort((a, b) => {
                 return b.getClickTime() - a.getClickTime();
             }).slice(0, 4);
-
 
 
             lastMagazines = lastMagazines.filter(mag => mag.getClickTime() > 0);

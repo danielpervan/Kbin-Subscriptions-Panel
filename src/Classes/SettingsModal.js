@@ -131,6 +131,10 @@ class SettingsModal {
                             <span class="description">Make the panel stick to the top and scroll independently.</span>
                         </label>
                         <label>
+                            <input type="checkbox" id="subscription-panel-alternative-menu" />
+                            Alternative menu
+                            <span class="description">Move the mobile menu button to the hamburger mobile menu for better compatibility with other scripts.</span>
+                        <label>
                             <input type="checkbox" id="subscription-panel-show-onboarding" />
                             Show onboarding
                             <span class="description">Show the onboarding step again on next load.</span>
@@ -176,6 +180,10 @@ class SettingsModal {
         }
 
         this.registerCheckbox("subscription-panel-sticky", "sticky", false, () => {
+            this.applySettings();
+        });
+
+        this.registerCheckbox("subscription-panel-alternative-menu", "alternativeMenu", false, () => {
             this.applySettings();
         });
 
@@ -286,6 +294,12 @@ class SettingsModal {
             document.body.classList.add("subscription-panel-sticky");
         } else {
             document.body.classList.remove("subscription-panel-sticky");
+        }
+
+        if (settings?.alternativeMenu) {
+            document.body.classList.add("subscription-panel-alternative-menu");
+        } else {
+            document.body.classList.remove("subscription-panel-alternative-menu");
         }
     }
 }

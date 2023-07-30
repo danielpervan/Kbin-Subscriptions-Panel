@@ -1,3 +1,17 @@
+/**
+ * Get the settings from local storage
+ * @returns {{
+ *     useCache: boolean,
+ *     useGroups: boolean,
+ *     showLastClicked: boolean,
+ *     sticky: boolean,
+ *     alternativeMenu: boolean,
+ *     forceMobile: boolean,
+ *     hideOnCollapse: boolean,
+ *     collapsed: boolean,
+ *     extendWidth: boolean
+ * }}
+ */
 export function getSettings() {
     const settings = localStorage.getItem("subscription-panel-settings");
     let settingsObj = {};
