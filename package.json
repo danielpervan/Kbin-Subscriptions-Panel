@@ -1,6 +1,6 @@
 {
   "name": "kbin-subscriptions-panel",
-  "version": "2.8.0",
+  "version": "2.9.0",
   "description": "",
   "type": "commonjs",
   "main": "Kbin Subscriptions Panel.js",

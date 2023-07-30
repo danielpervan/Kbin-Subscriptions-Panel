@@ -773,19 +773,23 @@ body.subscription-panel-injected {
     display: none;
   }
 
-  &.subscription-panel-alternative-menu .subscription-panel-mobile-button-alt {
-    display: block;
-  }
+
 
   &.subscription-panel-alternative-menu.subscription-panel-open .subscription-panel-mobile-close-button-alt {
     display: block;
   }
 
-  .subscription-panel-mobile-button-alt {
-    display: none;
+  .mobile-subscriptions-panel-button-alt {
+    @media (min-width: 991.98px) {
+      display: none !important;
+    }
   }
 
   @media (max-width: 991.98px) {
+    &.subscription-panel-alternative-menu .mobile-subscriptions-panel-button-alt {
+      display: flex;
+    }
+
     #header menu li a.subscription-panel-mobile-button {
       display: flex;
     }

@@ -88,19 +88,22 @@ class SubscriptionsPanel {
         }
 
         /** Add alternative mobile menu button */
-        const altMobileButton = Object.assign(document.createElement("button"), {
-            className: "subscription-panel-mobile-button-alt btn btn__secondary",
+        const altMobileButton = Object.assign(document.createElement("a"), {
             title: "Subscriptions",
             ariaLabel: "Subscriptions",
+            href: "#",
             innerHTML: '<i class="fa-solid fa-newspaper"></i>',
         });
         altMobileButton.addEventListener("click", (e) => {
             this.toggleOpenMobilePanel();
             e.preventDefault();
         });
-        const mobileMenu = document.querySelector(".section.options--top");
-        mobileMenu.insertBefore(altMobileButton, mobileMenu.firstChild.nextSibling.nextSibling);
-
+        const mobileMenu = document.querySelector(".top-options menu ul");
+        const mobileMenuLi = Object.assign(document.createElement('li'), {
+            className: 'mobile-subscriptions-panel-button-alt',
+        });
+        mobileMenuLi.appendChild(altMobileButton);
+        mobileMenu.insertBefore(mobileMenuLi, mobileMenu.lastChild.previousSibling);
         const altCloseButton = Object.assign(document.createElement("a"), {
             className: "subscription-panel-mobile-close-button-alt",
             title: "Close",
